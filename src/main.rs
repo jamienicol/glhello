@@ -12,7 +12,12 @@ fn main() {
 
     let context = unsafe { context.make_current().unwrap() };
 
-    let gl = unsafe { gl::GlesFns::load_with(|s| context.get_proc_address(s) as *const _) };
+    let gl = gl::ErrorReactingGl::wrap(
+        unsafe { gl::GlesFns::load_with(|s| context.get_proc_address(s) as *const _) },
+        move |_gl, function_name, err| {
+            println!("Error 0x{:x} in {}", err, function_name);
+        },
+    );
     gl.clear_color(0.0, 0.0, 0.0, 1.0);
 
     println!("Vendor: {}", gl.get_string(gl::VENDOR));
