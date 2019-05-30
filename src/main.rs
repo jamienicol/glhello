@@ -1,3 +1,4 @@
+use gl;
 use glutin::{ContextBuilder, ControlFlow, Event, EventsLoop, WindowBuilder, WindowEvent};
 
 fn main() {
@@ -10,6 +11,9 @@ fn main() {
 
     let context = unsafe { context.make_current().unwrap() };
 
+    gl::load_with(|s| context.get_proc_address(s) as *const _);
+    unsafe { gl::ClearColor(0.0, 0.0, 0.0, 1.0); }
+
     event_loop.run_forever(|event| {
         match event {
             Event::WindowEvent { ref event, .. } => match event {
@@ -18,6 +22,7 @@ fn main() {
                     context.resize(logical_size.to_physical(dpi_factor));
                 }
                 WindowEvent::Refresh => {
+                    unsafe { gl::Clear(gl::COLOR_BUFFER_BIT); }
                     context.swap_buffers().unwrap();
                 }
                 WindowEvent::CloseRequested => return ControlFlow::Break,
