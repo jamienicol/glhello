@@ -1,0 +1,7 @@
+[package]
+name = "glhello"
+version = "0.1.0"
+authors = ["Jamie Nicol"]
+edition = "2018"
+
+[dependencies]
