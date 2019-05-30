@@ -15,6 +15,10 @@ fn main() {
     let gl = unsafe { gl::GlesFns::load_with(|s| context.get_proc_address(s) as *const _) };
     gl.clear_color(0.0, 0.0, 0.0, 1.0);
 
+    println!("Vendor: {}", gl.get_string(gl::VENDOR));
+    println!("Renderer: {}", gl.get_string(gl::RENDERER));
+    println!("Version: {}", gl.get_string(gl::VERSION));
+
     event_loop.run_forever(|event| {
         match event {
             Event::WindowEvent { ref event, .. } => match event {
