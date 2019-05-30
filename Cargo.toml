@@ -5,5 +5,5 @@ authors = ["Jamie Nicol"]
 edition = "2018"
 
 [dependencies]
-gl = "0.6.0"
+gleam = "0.6.17"
 glutin = "0.21.0"

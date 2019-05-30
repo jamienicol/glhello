@@ -1,18 +1,19 @@
-use gl;
-use glutin::{ContextBuilder, ControlFlow, Event, EventsLoop, WindowBuilder, WindowEvent};
+use gleam::gl;
+use glutin::{Api, ContextBuilder, ControlFlow, Event, EventsLoop, GlRequest, WindowBuilder, WindowEvent};
 
 fn main() {
     let mut event_loop = EventsLoop::new();
     let wb = WindowBuilder::new().with_title("Hello GL!");
 
     let context = ContextBuilder::new()
+        .with_gl(GlRequest::Specific(Api::OpenGlEs, (3, 0)))
         .build_windowed(wb, &event_loop)
         .unwrap();
 
     let context = unsafe { context.make_current().unwrap() };
 
-    gl::load_with(|s| context.get_proc_address(s) as *const _);
-    unsafe { gl::ClearColor(0.0, 0.0, 0.0, 1.0); }
+    let gl = unsafe { gl::GlesFns::load_with(|s| context.get_proc_address(s) as *const _) };
+    gl.clear_color(0.0, 0.0, 0.0, 1.0);
 
     event_loop.run_forever(|event| {
         match event {
@@ -22,7 +23,7 @@ fn main() {
                     context.resize(logical_size.to_physical(dpi_factor));
                 }
                 WindowEvent::Refresh => {
-                    unsafe { gl::Clear(gl::COLOR_BUFFER_BIT); }
+                    gl.clear(gl::COLOR_BUFFER_BIT);
                     context.swap_buffers().unwrap();
                 }
                 WindowEvent::CloseRequested => return ControlFlow::Break,
