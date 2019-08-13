@@ -1,3 +1,7 @@
+mod tests;
+
+use tests::*;
+
 use gleam::gl;
 use glutin::{Api, ContextBuilder, ControlFlow, Event, EventsLoop, GlRequest, WindowBuilder, WindowEvent};
 
@@ -21,6 +25,8 @@ fn main() {
     println!("Vendor: {}", gl.get_string(gl::VENDOR));
     println!("Renderer: {}", gl.get_string(gl::RENDERER));
     println!("Version: {}", gl.get_string(gl::VERSION));
+
+    test_pbo_to_texture_array_upload(gl.as_ref());
 
     event_loop.run_forever(|event| {
         match event {
