@@ -27,6 +27,8 @@ fn main() {
     println!("Version: {}", gl.get_string(gl::VERSION));
 
     test_pbo_to_texture_array_upload(gl.as_ref());
+    test_blit_array_only_specified_layer(gl.as_ref());
+    test_blit_to_texture_array(gl.as_ref());
 
     event_loop.run_forever(|event| {
         match event {
