@@ -8,6 +8,41 @@ fn create_texture_data(width: usize, height: usize, pixel: &[u8]) -> Vec<u8> {
         .collect()
 }
 
+pub fn test_bgra_tex_image_3d(gl: &gl::Gl) {
+    println!("Running test_bgra_tex_image_3d");
+
+    let tex = gl.gen_textures(1)[0];
+    gl.bind_texture(gl::TEXTURE_2D_ARRAY, tex);
+    gl.tex_image_3d(gl::TEXTURE_2D_ARRAY, 0, gl::BGRA_EXT as _, 1, 1, 1, 0, gl::BGRA_EXT, gl::UNSIGNED_BYTE, None);
+
+    let err = gl.get_error();
+    println!("glTexImage3D() error={:x}", err);
+    if err == gl::NO_ERROR {
+        println!("PASS");
+    } else {
+        println!("FAIL");
+    }
+}
+
+pub fn test_blit_texture_array(gl: &gl::Gl) {
+    println!("Running test_blit_texture_array");
+
+    let src_tex = gl.gen_textures(1)[0];
+    gl.bind_texture(gl::TEXTURE_2D_ARRAY, src_tex);
+    gl.tex_storage_3d(gl::TEXTURE_2D_ARRAY, 1, gl::RGBA8, 256, 256, 1);
+    let src_fbo = gl.gen_framebuffers(1)[0];
+    gl.bind_framebuffer(gl::READ_FRAMEBUFFER, src_fbo);
+    gl.framebuffer_texture_layer(gl::READ_FRAMEBUFFER, gl::COLOR_ATTACHMENT0, src_tex, 0, 0);
+
+    gl.blit_framebuffer(0, 0, 256, 256, 0, 0, 256, 256, gl::COLOR_BUFFER_BIT, gl::NEAREST);
+    let err = gl.get_error();
+    println!("glBlitFramebuffer() error={:x}", err);
+    if err == gl::NO_ERROR {
+        println!("PASS");
+    } else {
+        println!("FAIL");
+    }
+}
 
 /// Test uploading data with a stride which is a multiple of 128 bytes, from a
 /// PBO to a non-0th layer of a texture array.
@@ -57,6 +92,8 @@ pub fn test_pbo_to_texture_array_upload(gl: &gl::Gl) {
         32, 32, 1,
         gl::RGBA, gl::UNSIGNED_BYTE, 0,
     );
+    let err = gl.get_error();
+    println!("tex_sub_image_3d_pbo() error={:x}", err);
 
     // Read back a pixel of the 1st layer of the texture. It should be red, but
     // on Adreno 3xx it will be black (and the 0th layer will be red instead).
@@ -82,8 +119,8 @@ pub fn test_pbo_to_texture_array_upload(gl: &gl::Gl) {
 ///
 /// On Adreno 3xx all layers >= the specified layer will be blitted, instead of
 /// just the specified layer.
-pub fn test_blit_array_only_specified_layer(gl: &gl::Gl) {
-    println!("test_blit_array_only_blit_specified_layer");
+pub fn test_blit_to_only_specified_layer(gl: &gl::Gl) {
+    println!("test_blit_to_only_specified_layer");
 
     let red = create_texture_data(32, 32, &[255, 0, 0, 255]);
     let green = create_texture_data(32, 32, &[0, 255, 0, 255]);
@@ -157,8 +194,8 @@ pub fn test_blit_array_only_specified_layer(gl: &gl::Gl) {
 /// Test blitting to an FBO attached to a non-0th layer of a texture array.
 ///
 /// On some Adrenos (4xx, 5xx, 6xx) this will blit to the 0th layer instead.
-pub fn test_blit_to_texture_array(gl: &gl::Gl) {
-    println!("test_blit_to_texture_array");
+pub fn test_blit_to_non_zero_layer(gl: &gl::Gl) {
+    println!("test_blit_to_non_zero_layer");
 
     let red = create_texture_data(32, 32, &[255, 0, 0, 255]);
     let black = create_texture_data(32, 32, &[0, 0, 0, 255]);
